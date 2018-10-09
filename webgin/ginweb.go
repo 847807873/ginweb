@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func someGet(c *gin.Context) {
@@ -37,5 +36,22 @@ func main() {
 		message := name + " is " + action
 		c.String(http.StatusOK, message)
 	})
-	r.Run(":7891") // listen and serve on 0.0.0.0:8080
+
+	//添加默认的字段属性
+	/*
+	http://127.0.0.1:7891/welcome?lastname=%E5%B0%8F%E7%B1%B3
+	*/
+	r.GET("/welcome", func(context *gin.Context) {
+		//在url没有firstname的时候，展示默认值
+		//存在不管有没有值默认值都是不替换的
+		//http://127.0.0.1:7891/welcome?lastname=%E5%B0%8F%E7%B1%B3&firstname=
+		firstname :=context.DefaultQuery("firstname","郭艳帅123")
+
+		//lastname :=context.Query("lastname")
+		//等价的
+		lastname := context.Request.URL.Query().Get("lastname")
+
+		context.String(http.StatusOK,"Hello %s %s",firstname,lastname)
+	})
+	r.Run(":7892") // listen and serve on 0.0.0.0:8080
 }
